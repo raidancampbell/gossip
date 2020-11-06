@@ -1,0 +1,15 @@
+network:
+  host: darwin.network
+  port: 6666
+  ssl: false
+  channels:
+    - "#cwru"
+    - "#bot-test"
+nick: gossip
+logging:
+  level: debug
+  splunk:
+    enabled: true
+    host: splunk.autok8s.raidancampbell.com
+    hecPort: 9997 # TODO: enable this in k8s
+    token: ef1dafce-8d3e-40b1-9a64-82cbc5e4274b
