@@ -2,12 +2,16 @@ package main
 
 import (
 	"fmt"
+	"github.com/raidancampbell/gossip/conf"
+	"github.com/raidancampbell/gossip/gossip"
+	"github.com/raidancampbell/gossip/logging"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"net/http"
 )
 
 var (
-	conf = &cfg{}
+	cfg = &conf.Cfg{}
 )
 
 func initialize() {
@@ -18,11 +22,29 @@ func initialize() {
 		panic(err)
 	}
 
-	viper.Unmarshal(conf)
+	viper.Unmarshal(cfg)
+
+	// http://splunk.autok8s.raidancampbell.com/en-US/app/search/search
+	logrus.AddHook(&logging.SplunkHook{
+		Token:        cfg.Logging.Splunk.Token,
+		Endpoint:     fmt.Sprintf("http://%s:%d/services/collector",cfg.Logging.Splunk.Host, cfg.Logging.Splunk.HECPort),
+		Client: http.DefaultClient,
+	})
+
+	lvl, err := logrus.ParseLevel(cfg.Logging.Level)
+	if err != nil {
+		lvl = logrus.InfoLevel
+	}
+	logrus.SetLevel(lvl)
+
 }
 
 func main() {
+	fmt.Println("initializing...")
 	initialize()
-	logrus.Info(conf.Nick)
-	fmt.Println(conf.Network.Host)
+	logrus.Info("initialized")
+	logrus.Info(cfg.Nick)
+	fmt.Println(cfg.Network.Host)
+	g := gossip.New(cfg.Network, cfg.Nick)
+	g.Begin()
 }
