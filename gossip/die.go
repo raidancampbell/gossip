@@ -17,7 +17,7 @@ var quit = StatelessTrigger{
 		logrus.Info("Exiting...")
 		g.msgChan <- &irc.Message{
 			Command: irc.QUIT,
-			Params:  []string{msg.Params[0], "goodbye"},
+			Params:  []string{"goodbye"},
 		}
 		time.Sleep(100 * time.Millisecond)
 		g.c.Close()

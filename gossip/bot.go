@@ -26,7 +26,7 @@ func New(n conf.Network, nick string) *Bot {
 		channels: n.Channels,
 		msgChan: make(chan *irc.Message),
 		joinChannels: &sync.Once{},
-		triggers: []Trigger{pingPong, joinChans, invite, userPingPong, htmlTitle, quit},
+		triggers: []Trigger{pingPong, joinChans, invite, userPingPong, htmlTitle, quit, part},
 	}
 	/* Feature todo:
 	[ ] control its nick
@@ -36,7 +36,7 @@ func New(n conf.Network, nick string) *Bot {
 	[ ] source
 	[ ] wolfram
 	[ ] youtube
-	[ ] part
+	[X] part
 	[ ] feature toggles (needs interface/impl for features)
 	*/
 	return b
