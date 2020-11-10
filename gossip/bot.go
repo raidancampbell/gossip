@@ -26,7 +26,7 @@ func New(n conf.Network, nick string) *Bot {
 		channels: n.Channels,
 		msgChan: make(chan *irc.Message),
 		joinChannels: &sync.Once{},
-		triggers: []Trigger{pingPong, joinChans, invite, userPingPong},
+		triggers: []Trigger{pingPong, joinChans, invite, userPingPong, htmlTitle},
 	}
 	return b
 }
@@ -85,12 +85,19 @@ func (g *Bot) decodeLoop() {
 			return
 		}
 		logrus.WithField("message", msg).Debug("incoming message")
-		for _, trigger := range g.triggers {
-			if trigger.Condition(g, msg) {
-				shouldContinue := trigger.Action(g, msg)
-				if !shouldContinue {
-					break
-				}
+		// each incoming message gets its own goroutine
+		// just in case I really screw up and something hangs/dies,
+		// so that pingpong still lives on
+		go g.handleTriggers(msg)
+	}
+}
+
+func (g *Bot) handleTriggers(msg *irc.Message) {
+	for _, trigger := range g.triggers {
+		if trigger.Condition(g, msg) {
+			shouldContinue := trigger.Action(g, msg)
+			if !shouldContinue {
+				break
 			}
 		}
 	}
