@@ -17,8 +17,8 @@ const (
 )
 
 // prints the html title text of any URLs within a message
-var htmlTitle = Trigger {
-	Condition: func(g *Bot, msg *irc.Message) bool {
+var htmlTitle = StatelessTrigger{
+	Cond: func(g *Bot, msg *irc.Message) bool {
 		if msg.Command != irc.PRIVMSG {
 			return false
 		}
@@ -26,7 +26,7 @@ var htmlTitle = Trigger {
 		return w != ""
 	},
 
-	Action: func(g *Bot, msg *irc.Message) (shouldContinue bool) {
+	Act: func(g *Bot, msg *irc.Message) (shouldContinue bool) {
 		shouldContinue = true // always
 		var u *url.URL
 		for _, word := range strings.Split(msg.Params[1], " ") {

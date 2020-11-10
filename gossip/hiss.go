@@ -7,8 +7,8 @@ import (
 
 // 7 bits or bust
 // also don't ever say the word 'moist'
-var hiss = Trigger {
-	Condition: func(g *Bot, msg *irc.Message) bool {
+var hiss = StatelessTrigger{
+	Cond: func(g *Bot, msg *irc.Message) bool {
 		if msg.Command != irc.PRIVMSG {
 			return false
 		}
@@ -22,7 +22,7 @@ var hiss = Trigger {
 		}
 		return false
 	},
-	Action: func(g *Bot, msg *irc.Message) bool {
+	Act: func(g *Bot, msg *irc.Message) bool {
 		g.msgChan <- &irc.Message{
 			Command: irc.PRIVMSG,
 			Params:  []string{msg.Params[0], "hisss"},

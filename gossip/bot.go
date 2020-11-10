@@ -28,6 +28,17 @@ func New(n conf.Network, nick string) *Bot {
 		joinChannels: &sync.Once{},
 		triggers: []Trigger{pingPong, joinChans, invite, userPingPong, htmlTitle, quit},
 	}
+	/* Feature todo:
+	[ ] control its nick
+	[ ] owner authorization
+	[ ] reminders (needs state)
+	[ ] karma (needs state)
+	[ ] source
+	[ ] wolfram
+	[ ] youtube
+	[ ] part
+	[ ] feature toggles (needs interface/impl for features)
+	*/
 	return b
 }
 
