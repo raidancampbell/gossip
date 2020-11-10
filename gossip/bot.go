@@ -26,14 +26,14 @@ func New(n conf.Network, nick string) *Bot {
 		channels: n.Channels,
 		msgChan: make(chan *irc.Message),
 		joinChannels: &sync.Once{},
-		triggers: []Trigger{pingPong, joinChans, invite, userPingPong, htmlTitle, quit, part},
+		triggers: []Trigger{pingPong, joinChans, invite, userPingPong, htmlTitle, quit, part, rename},
 	}
 	/* Feature todo:
-	[ ] control its nick
+	[X] control its nick
 	[ ] owner authorization
 	[ ] reminders (needs state)
 	[ ] karma (needs state)
-	[ ] source
+	[X] source
 	[ ] wolfram
 	[ ] youtube
 	[X] part
