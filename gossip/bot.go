@@ -26,7 +26,7 @@ func New(n conf.Network, nick string) *Bot {
 		channels: n.Channels,
 		msgChan: make(chan *irc.Message),
 		joinChannels: &sync.Once{},
-		triggers: []Trigger{pingPong, joinChans, invite, userPingPong, htmlTitle},
+		triggers: []Trigger{pingPong, joinChans, invite, userPingPong, htmlTitle, quit},
 	}
 	return b
 }
