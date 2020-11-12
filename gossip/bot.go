@@ -9,7 +9,6 @@ import (
 	"gopkg.in/sorcix/irc.v2"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 	"sync"
 )
 
@@ -31,13 +30,13 @@ func New(n conf.Network, nick string) *Bot {
 		channels: n.Channels,
 		msgChan: make(chan *irc.Message),
 		joinChannels: &sync.Once{},
-		triggers: []Trigger{pingPong, joinChans, invite, userPingPong, htmlTitle, quit, part, rename},
+		triggers: []Trigger{pingPong, joinChans, invite, userPingPong, htmlTitle, quit, part, rename, karmaCounter, KarmaBest, KarmaWorst},
 	}
 	/* Feature todo:
 	[X] control its nick
 	[ ] owner authorization
 	[X] reminders (needs state)
-	[ ] karma (needs state)
+	[X] karma (needs state)
 	[X] source
 	[ ] wolfram
 	[ ] youtube
@@ -46,14 +45,17 @@ func New(n conf.Network, nick string) *Bot {
 	*/
 	var err error
 	b.db, err = gorm.Open(sqlite.Open("gossip.db"), &gorm.Config{
-		Logger: &data.GormLogger{LogLevel: logger.Info},
+		//TODO: not really doing anything
+		//Logger: &data.GormLogger{LogLevel: logger.Info},
 	})
+	b.db = b.db.Debug()
 	if err != nil {
 		panic("failed to connect database")
 	}
 
 	// Migrate the schema
 	b.db.AutoMigrate(&data.Reminder{})
+	b.db.AutoMigrate(&data.Karma{})
 	b.triggers = append(b.triggers, NewReminder(b))
 
 	return b
