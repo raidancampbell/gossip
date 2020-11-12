@@ -3,9 +3,13 @@ package gossip
 import (
 	"fmt"
 	"github.com/raidancampbell/gossip/conf"
+	"github.com/raidancampbell/gossip/data"
 	"github.com/raidancampbell/libraidan/pkg/rruntime"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/sorcix/irc.v2"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"sync"
 )
 
@@ -17,6 +21,7 @@ type Bot struct {
 	c *irc.Conn
 	joinChannels *sync.Once // todo: move this into its own struct
 	triggers []Trigger
+	db *gorm.DB
 }
 
 func New(n conf.Network, nick string) *Bot {
@@ -31,7 +36,7 @@ func New(n conf.Network, nick string) *Bot {
 	/* Feature todo:
 	[X] control its nick
 	[ ] owner authorization
-	[ ] reminders (needs state)
+	[X] reminders (needs state)
 	[ ] karma (needs state)
 	[X] source
 	[ ] wolfram
@@ -39,6 +44,18 @@ func New(n conf.Network, nick string) *Bot {
 	[X] part
 	[ ] feature toggles (needs interface/impl for features)
 	*/
+	var err error
+	b.db, err = gorm.Open(sqlite.Open("gossip.db"), &gorm.Config{
+		Logger: &data.GormLogger{LogLevel: logger.Info},
+	})
+	if err != nil {
+		panic("failed to connect database")
+	}
+
+	// Migrate the schema
+	b.db.AutoMigrate(&data.Reminder{})
+	b.triggers = append(b.triggers, NewReminder(b))
+
 	return b
 }
 
