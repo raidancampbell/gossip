@@ -3,7 +3,7 @@ package gossip
 import "gopkg.in/sorcix/irc.v2"
 
 // pattern stolen from https://github.com/whyrusleeping/hellabot/blob/master/hellabot.go
-type StatelessTrigger struct {
+type SyncTrigger struct {
 	// Returns true if this trigger applies to the passed in message
 	Cond func(*Bot, *irc.Message) (shouldApply bool)
 
@@ -12,10 +12,10 @@ type StatelessTrigger struct {
 	Act func(*Bot, *irc.Message) (shouldContinue bool)
 }
 
-func (t StatelessTrigger) Condition(b *Bot, msg *irc.Message) (shouldApply bool) {
+func (t SyncTrigger) Condition(b *Bot, msg *irc.Message) (shouldApply bool) {
 	return t.Cond(b, msg)
 }
-func (t StatelessTrigger) Action(b *Bot, msg *irc.Message) (shouldContinue bool) {
+func (t SyncTrigger) Action(b *Bot, msg *irc.Message) (shouldContinue bool) {
 	return t.Act(b, msg)
 }
 
@@ -24,7 +24,7 @@ type Trigger interface {
 	Action(*Bot, *irc.Message) (shouldContinue bool)
 }
 
-var pingPong = StatelessTrigger{
+var pingPong = SyncTrigger{
 	Cond: func(g *Bot, msg *irc.Message) bool {
 		return msg.Command == irc.PING
 	},
@@ -38,7 +38,7 @@ var pingPong = StatelessTrigger{
 }
 
 // join desired channels on startup
-var joinChans = StatelessTrigger{
+var joinChans = SyncTrigger{
 	Cond: func(g *Bot, msg *irc.Message) bool {
 		return msg.Command == irc.RPL_WELCOME
 	},
@@ -56,7 +56,7 @@ var joinChans = StatelessTrigger{
 }
 
 // on /invite, join the desired channel
-var invite = StatelessTrigger{
+var invite = SyncTrigger{
 	Cond: func(g *Bot, msg *irc.Message) bool {
 		return msg.Command == irc.INVITE
 	},
@@ -70,7 +70,7 @@ var invite = StatelessTrigger{
 }
 
 // on !ping, give pong!
-var userPingPong = StatelessTrigger{
+var userPingPong = SyncTrigger{
 	Cond: func(g *Bot, msg *irc.Message) bool {
 		return msg.Command == irc.PRIVMSG && len(msg.Params) == 2 && msg.Params[1] == "!ping"
 	},

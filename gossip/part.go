@@ -7,7 +7,7 @@ import (
 
 // leave on !part
 //TODO: add authorization
-var part = StatelessTrigger{
+var part = SyncTrigger{
 	Cond: func(g *Bot, msg *irc.Message) bool {
 		return msg.Command == irc.PRIVMSG && len(msg.Params) == 2 && msg.Params[1] == "!part"
 	},

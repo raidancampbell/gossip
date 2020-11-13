@@ -7,7 +7,7 @@ import (
 
 // 7 bits or bust
 // also don't ever say the word 'moist'
-var hiss = StatelessTrigger{
+var hiss = SyncTrigger{
 	Cond: func(g *Bot, msg *irc.Message) bool {
 		if msg.Command != irc.PRIVMSG {
 			return false

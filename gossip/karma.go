@@ -8,7 +8,7 @@ import (
 )
 
 
-var karmaCounter = StatelessTrigger{
+var karmaCounter = SyncTrigger{
 	Cond: func(bot *Bot, msg *irc.Message) (shouldApply bool) {
 		return msg.Command == irc.PRIVMSG && len(msg.Params) == 2 && (strings.Contains(msg.Params[1], "++") || strings.Contains(msg.Params[1], "--"))
 	},
@@ -58,7 +58,7 @@ var karmaCounter = StatelessTrigger{
 	},
 }
 
-var KarmaBest = StatelessTrigger{
+var KarmaBest = SyncTrigger{
 	Cond: func(g *Bot, msg *irc.Message) bool {
 		return msg.Command == irc.PRIVMSG && len(msg.Params) == 2 && msg.Params[1] == "!karma best"
 	},
@@ -80,7 +80,7 @@ var KarmaBest = StatelessTrigger{
 	},
 }
 
-var KarmaWorst = StatelessTrigger{
+var KarmaWorst = SyncTrigger{
 	Cond: func(g *Bot, msg *irc.Message) bool {
 		return msg.Command == irc.PRIVMSG && len(msg.Params) == 2 && msg.Params[1] == "!karma worst"
 	},
