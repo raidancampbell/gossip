@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"net/http"
+	"net/http/httputil"
 	"os"
 )
 
@@ -64,9 +65,14 @@ func (s *SplunkHook) Fire(e *logrus.Entry) error {
 	go func() {
 		res, err := s.Client.Do(req)
 		if err != nil {
+			fmt.Println(err)
 			return
 		}
 		defer res.Body.Close()
+		if false { // dumb, but here for logging
+			response, _ := httputil.DumpResponse(res, true)
+			fmt.Println(string(response))
+		}
 	}()
 	return nil
 }
