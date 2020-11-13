@@ -47,7 +47,7 @@ var karmaCounter = StatelessTrigger{
 		k := &data.Karma{
 			Object:   token,
 			Value:    0,
-			Location: msg.Params[0],
+			Location: mirrorMsg(g, msg),
 		}
 
 		g.db.Model(k).Where(k).First(k)
@@ -67,13 +67,13 @@ var KarmaBest = StatelessTrigger{
 
 		// in the karma table, sorted by value descending, get the top 5, where we match the channel
 		g.db.Model(&data.Karma{}).Order("value desc").Limit(5).Where(&data.Karma{
-			Location: msg.Params[0],
+			Location: mirrorMsg(g, msg),
 		}).Find(&karma)
 
 		for _, k := range karma{
 			g.msgChan <- &irc.Message{
 				Command: irc.PRIVMSG,
-				Params:  []string{msg.Params[0], fmt.Sprintf("%d: %s", k.Value, k.Object)},
+				Params:  []string{mirrorMsg(g, msg), fmt.Sprintf("%d: %s", k.Value, k.Object)},
 			}
 		}
 		return false
@@ -89,13 +89,13 @@ var KarmaWorst = StatelessTrigger{
 
 		// in the karma table, sorted by value descending, get the top 5, where we match the channel
 		g.db.Model(&data.Karma{}).Order("value asc").Limit(5).Where(&data.Karma{
-			Location: msg.Params[0],
+			Location: mirrorMsg(g, msg),
 		}).Find(&karma)
 
 		for _, k := range karma{
 			g.msgChan <- &irc.Message{
 				Command: irc.PRIVMSG,
-				Params:  []string{msg.Params[0], fmt.Sprintf("%d: %s", k.Value, k.Object)},
+				Params:  []string{mirrorMsg(g, msg), fmt.Sprintf("%d: %s", k.Value, k.Object)},
 			}
 		}
 		return false

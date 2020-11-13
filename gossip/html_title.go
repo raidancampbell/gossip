@@ -79,7 +79,7 @@ var htmlTitle = StatelessTrigger{
 				if nextType == html.TextToken {
 					g.msgChan <- &irc.Message{
 						Command: irc.PRIVMSG,
-						Params:  []string{msg.Params[0], tok.Token().Data},
+						Params:  []string{mirrorMsg(g, msg), tok.Token().Data},
 					}
 					break
 				}

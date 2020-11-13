@@ -92,7 +92,7 @@ func (rmd rmd) Action(g *Bot, msg *irc.Message) (shouldContinue bool) {
 	contents = fmt.Sprintf("%s: %s", msg.Name, contents)
 
 	r := data.Reminder{
-		Location: msg.Params[0],
+		Location: mirrorMsg(g, msg),
 		Text: contents,
 		At: time.Now().Add(duration),
 	}
@@ -101,7 +101,7 @@ func (rmd rmd) Action(g *Bot, msg *irc.Message) (shouldContinue bool) {
 
 	g.msgChan <- &irc.Message{
 		Command: irc.PRIVMSG,
-		Params:  []string{msg.Params[0], fmt.Sprintf("I'll send you the reminder '%s' at %s", r.Text, r.At.Format("2006-01-02 15:04:05 -0700 MST"))},
+		Params:  []string{mirrorMsg(g, msg), fmt.Sprintf("I'll send you the reminder '%s' at %s", r.Text, r.At.Format("2006-01-02 15:04:05 -0700 MST"))},
 	}
 	return false
 }

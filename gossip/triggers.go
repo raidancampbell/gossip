@@ -77,7 +77,7 @@ var userPingPong = StatelessTrigger{
 	Act: func(g *Bot, msg *irc.Message) bool {
 		g.msgChan <- &irc.Message{
 			Command: irc.PRIVMSG,
-			Params:  []string{msg.Params[0], "pong!"},
+			Params:  []string{mirrorMsg(g, msg), "pong!"},
 		}
 		return false
 	},

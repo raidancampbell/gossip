@@ -25,7 +25,7 @@ var hiss = StatelessTrigger{
 	Act: func(g *Bot, msg *irc.Message) bool {
 		g.msgChan <- &irc.Message{
 			Command: irc.PRIVMSG,
-			Params:  []string{msg.Params[0], "hisss"},
+			Params:  []string{mirrorMsg(g, msg), "hisss"},
 		}
 		return false
 	},

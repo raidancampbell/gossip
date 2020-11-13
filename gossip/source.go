@@ -10,7 +10,7 @@ var source = StatelessTrigger{
 	Act: func(g *Bot, msg *irc.Message) bool {
 		g.msgChan <- &irc.Message{
 			Command: irc.PRIVMSG,
-			Params:  []string{msg.Params[0], "https://github.com/raidancampbell/gossip"},
+			Params:  []string{mirrorMsg(g, msg), "https://github.com/raidancampbell/gossip"},
 		}
 		return false
 	},
