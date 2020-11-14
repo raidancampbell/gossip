@@ -8,6 +8,15 @@ import (
 )
 
 
+var karma = &ComposedTrigger{
+	subTriggers: []Trigger{karmaCounter, KarmaBest, KarmaWorst},
+	meta: &data.TriggerMeta{
+		Disabled: false,
+		Priority: 0,
+		Name:     "karma",
+	},
+}
+
 var karmaCounter = &SyncTrigger{
 	Cond: func(bot *Bot, msg *irc.Message) (shouldApply bool) {
 		return msg.Command == irc.PRIVMSG && len(msg.Params) == 2 && (strings.Contains(msg.Params[1], "++") || strings.Contains(msg.Params[1], "--"))

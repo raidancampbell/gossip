@@ -7,6 +7,16 @@ import (
 	"strings"
 )
 
+
+var toggle = &ComposedTrigger{
+	subTriggers: []Trigger{triggerToggle, triggerStatus},
+	meta: &data.TriggerMeta{
+		Disabled: false,
+		Priority: 0,
+		Name:     "toggle",
+	},
+}
+
 // toggle triggers on !toggle, !enable, !disable
 var triggerToggle = &SyncTrigger{
 	Cond: func(g *Bot, msg *irc.Message) bool {

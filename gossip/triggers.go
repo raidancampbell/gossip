@@ -31,6 +31,33 @@ func (t *SyncTrigger) Meta(m *data.TriggerMeta) {
 	t.meta = m
 }
 
+type ComposedTrigger struct {
+	subTriggers []Trigger
+	meta *data.TriggerMeta
+}
+func (t *ComposedTrigger) Condition(b *Bot, msg *irc.Message) (shouldApply bool) {
+	for i := range t.subTriggers {
+		if t.subTriggers[i].Condition(b, msg) {
+			return true
+		}
+	}
+	return false
+}
+func (t *ComposedTrigger) Action(b *Bot, msg *irc.Message) (shouldContinue bool) {
+	for i := range t.subTriggers {
+		if t.subTriggers[i].Condition(b, msg) {
+			return t.subTriggers[i].Action(b, msg)
+		}
+	}
+	return true // not possible
+}
+func (t *ComposedTrigger) GetMeta() *data.TriggerMeta {
+	return t.meta
+}
+func (t *ComposedTrigger) Meta(m *data.TriggerMeta) {
+	t.meta = m
+}
+
 type Trigger interface {
 	Condition(*Bot, *irc.Message) (shouldApply bool)
 	Action(*Bot, *irc.Message) (shouldContinue bool)

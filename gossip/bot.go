@@ -32,7 +32,7 @@ func New(cfg *conf.Cfg) *Bot {
 		channels:     cfg.Network.Channels,
 		msgChan:      make(chan *irc.Message),
 		joinChannels: &sync.Once{},
-		triggers:     []Trigger{pingPong, joinChans, invite, userPingPong, htmlTitle, die, part, rename, karmaCounter, KarmaBest, KarmaWorst, triggerToggle, triggerStatus},
+		triggers:     []Trigger{pingPong, joinChans, invite, userPingPong, htmlTitle, die, part, rename, karma, toggle},
 		cfg:          cfg,
 	}
 	/* Feature todo:
