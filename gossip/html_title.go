@@ -87,6 +87,11 @@ var htmlTitle = SyncTrigger{
 		}
 		return
 	},
+	meta: TriggerMeta{
+		Disabled: false,
+		Priority: 0,
+		Name:     "HTMLTitle",
+	},
 }
 
 func extractURLWord(s string) string {

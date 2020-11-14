@@ -56,6 +56,11 @@ var karmaCounter = SyncTrigger{
 
 		return true
 	},
+	meta: TriggerMeta{
+		Disabled: false,
+		Priority: 0,
+		Name:     "karmaCounter",
+	},
 }
 
 var KarmaBest = SyncTrigger{
@@ -78,6 +83,11 @@ var KarmaBest = SyncTrigger{
 		}
 		return false
 	},
+	meta: TriggerMeta{
+		Disabled: false,
+		Priority: 0,
+		Name:     "karmaBest",
+	},
 }
 
 var KarmaWorst = SyncTrigger{
@@ -99,5 +109,10 @@ var KarmaWorst = SyncTrigger{
 			}
 		}
 		return false
+	},
+	meta: TriggerMeta{
+		Disabled: false,
+		Priority: 0,
+		Name:     "karmaWorst",
 	},
 }

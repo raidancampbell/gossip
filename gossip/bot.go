@@ -124,7 +124,7 @@ func (g *Bot) decodeLoop() {
 
 func (g *Bot) handleTriggers(msg *irc.Message) {
 	for _, trigger := range g.triggers {
-		if trigger.Condition(g, msg) {
+		if !trigger.GetMeta().Disabled && trigger.Condition(g, msg) {
 			shouldContinue := trigger.Action(g, msg)
 			if !shouldContinue {
 				break

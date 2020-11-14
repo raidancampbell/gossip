@@ -29,4 +29,9 @@ var hiss = SyncTrigger{
 		}
 		return false
 	},
+	meta: TriggerMeta{
+		Disabled: false,
+		Priority: 0,
+		Name:     "hiss",
+	},
 }

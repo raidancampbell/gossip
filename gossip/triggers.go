@@ -10,6 +10,15 @@ type SyncTrigger struct {
 	// The action to perform if Cond is true
 	// return true if processing should continue
 	Act func(*Bot, *irc.Message) (shouldContinue bool)
+
+	meta TriggerMeta
+}
+
+// metadata for triggers, extracted for ease of iteration
+type TriggerMeta struct {
+	Disabled bool
+	Priority int // maybe a comparator? maybe don't need it at all?
+	Name string
 }
 
 func (t SyncTrigger) Condition(b *Bot, msg *irc.Message) (shouldApply bool) {
@@ -18,10 +27,14 @@ func (t SyncTrigger) Condition(b *Bot, msg *irc.Message) (shouldApply bool) {
 func (t SyncTrigger) Action(b *Bot, msg *irc.Message) (shouldContinue bool) {
 	return t.Act(b, msg)
 }
+func (t SyncTrigger) GetMeta() TriggerMeta {
+	return t.meta
+}
 
 type Trigger interface {
 	Condition(*Bot, *irc.Message) (shouldApply bool)
 	Action(*Bot, *irc.Message) (shouldContinue bool)
+	GetMeta() TriggerMeta
 }
 
 var pingPong = SyncTrigger{
@@ -34,6 +47,11 @@ var pingPong = SyncTrigger{
 			Params:  msg.Params,
 		}
 		return false
+	},
+	meta: TriggerMeta{
+		Disabled: false,
+		Priority: 0,
+		Name:     "pingPong",
 	},
 }
 
@@ -53,6 +71,12 @@ var joinChans = SyncTrigger{
 		})
 		return true
 	},
+	meta: TriggerMeta{
+		Disabled: false,
+		Priority: 0,
+		Name:     "joinChans",
+	},
+
 }
 
 // on /invite, join the desired channel
@@ -67,6 +91,11 @@ var invite = SyncTrigger{
 		}
 		return false
 	},
+	meta: TriggerMeta{
+		Disabled: false,
+		Priority: 0,
+		Name:     "invite",
+	},
 }
 
 // on !ping, give pong!
@@ -80,5 +109,10 @@ var userPingPong = SyncTrigger{
 			Params:  []string{mirrorMsg(g, msg), "pong!"},
 		}
 		return false
+	},
+	meta: TriggerMeta{
+		Disabled: false,
+		Priority: 0,
+		Name:     "userPingPong",
 	},
 }

@@ -24,4 +24,9 @@ var quit = SyncTrigger{
 		os.Exit(0)
 		return false
 	},
+	meta: TriggerMeta{
+		Disabled: false,
+		Priority: 0,
+		Name:     "die",
+	},
 }

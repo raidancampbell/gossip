@@ -19,4 +19,9 @@ var rename = SyncTrigger{
 		}
 		return false
 	},
+	meta: TriggerMeta{
+		Disabled: false,
+		Priority: 0,
+		Name:     "rename",
+	},
 }
