@@ -1,6 +1,7 @@
 package gossip
 
 import (
+	"github.com/raidancampbell/gossip/data"
 	"gopkg.in/sorcix/irc.v2"
 	"strings"
 )
@@ -29,7 +30,7 @@ var hiss = &SyncTrigger{
 		}
 		return false
 	},
-	meta: TriggerMeta{
+	meta: &data.TriggerMeta{
 		Disabled: false,
 		Priority: 0,
 		Name:     "hiss",

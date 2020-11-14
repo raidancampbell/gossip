@@ -1,6 +1,9 @@
 package gossip
 
-import "gopkg.in/sorcix/irc.v2"
+import (
+	"github.com/raidancampbell/gossip/data"
+	"gopkg.in/sorcix/irc.v2"
+)
 
 // on !source link the source code
 var source = &SyncTrigger{
@@ -14,7 +17,7 @@ var source = &SyncTrigger{
 		}
 		return false
 	},
-	meta: TriggerMeta{
+	meta: &data.TriggerMeta{
 		Disabled: false,
 		Priority: 0,
 		Name:     "source",

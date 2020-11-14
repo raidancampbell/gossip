@@ -13,27 +13,27 @@ import (
 )
 
 type Bot struct {
-	addr string
-	nick string
-	channels []string
-	msgChan chan *irc.Message
-	c *irc.Conn
+	addr         string
+	nick         string
+	channels     []string
+	msgChan      chan *irc.Message
+	c            *irc.Conn
 	joinChannels *sync.Once // todo: move this into its own struct
-	triggers []Trigger
-	db *gorm.DB
-	cfg *conf.Cfg
+	triggers     []Trigger
+	db           *gorm.DB
+	cfg          *conf.Cfg
 }
 
 func New(cfg *conf.Cfg) *Bot {
 
 	b := &Bot{
-		addr: fmt.Sprintf("%s:%d", cfg.Network.Host, cfg.Network.Port),
-		nick: cfg.Nick,
-		channels: cfg.Network.Channels,
-		msgChan: make(chan *irc.Message),
+		addr:         fmt.Sprintf("%s:%d", cfg.Network.Host, cfg.Network.Port),
+		nick:         cfg.Nick,
+		channels:     cfg.Network.Channels,
+		msgChan:      make(chan *irc.Message),
 		joinChannels: &sync.Once{},
-		triggers: []Trigger{pingPong, joinChans, invite, userPingPong, htmlTitle, die, part, rename, karmaCounter, KarmaBest, KarmaWorst, triggerToggle, triggerStatus},
-		cfg: cfg,
+		triggers:     []Trigger{pingPong, joinChans, invite, userPingPong, htmlTitle, die, part, rename, karmaCounter, KarmaBest, KarmaWorst, triggerToggle, triggerStatus},
+		cfg:          cfg,
 	}
 	/* Feature todo:
 	[X] control its nick
@@ -45,7 +45,7 @@ func New(cfg *conf.Cfg) *Bot {
 	[ ] youtube
 	[X] part
 	[X] feature toggles (needs interface/impl for features)
-	[ ] persistent feature toggles
+	[X] persistent feature toggles
 	*/
 	var err error
 	b.db, err = gorm.Open(sqlite.Open("gossip.db"), &gorm.Config{
@@ -60,8 +60,23 @@ func New(cfg *conf.Cfg) *Bot {
 	// Migrate the schema
 	b.db.AutoMigrate(&data.Reminder{})
 	b.db.AutoMigrate(&data.Karma{})
+	b.db.AutoMigrate(&data.TriggerMeta{})
 	b.triggers = append(b.triggers, NewReminder(b))
 
+	// initialize trigger state
+	for i := range b.triggers {
+		m := data.TriggerMeta{
+			Name: b.triggers[i].GetMeta().Name,
+		}
+		tx := b.db.Model(&m).Where(&m).First(&m)
+		if tx.RowsAffected == 0 {
+			b.db.Model(&m).Create(b.triggers[i].GetMeta())
+			// read it back to get gorm's internal metadata/index
+			b.db.Model(&m).Where(&m).First(&m)
+		}
+		b.triggers[i].Meta(&m)
+
+	}
 	return b
 }
 
@@ -102,7 +117,6 @@ func (g *Bot) encodeLoop() {
 		}
 	}
 }
-
 
 func (g *Bot) decodeLoop() {
 	for {

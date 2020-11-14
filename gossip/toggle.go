@@ -2,6 +2,7 @@ package gossip
 
 import (
 	"fmt"
+	"github.com/raidancampbell/gossip/data"
 	"gopkg.in/sorcix/irc.v2"
 	"strings"
 )
@@ -29,11 +30,14 @@ var triggerToggle = &SyncTrigger{
 				} else if strings.EqualFold(words[0], "!false") {
 					nextState = false
 				}
+
 				g.msgChan <- &irc.Message{
 					Command: irc.PRIVMSG,
 					Params:  []string{mirrorMsg(g, msg), fmt.Sprintf("%s: was %s, now %s", g.triggers[i].GetMeta().Name, disabledToStr(g.triggers[i].GetMeta().Disabled), disabledToStr(nextState))},
 				}
 				g.triggers[i].GetMeta().Disabled = nextState
+
+				g.db.Model(&data.TriggerMeta{}).Where(&data.TriggerMeta{Name: g.triggers[i].GetMeta().Name}).Save(g.triggers[i].GetMeta())
 				return false
 			}
 		}
@@ -44,7 +48,7 @@ var triggerToggle = &SyncTrigger{
 		}
 		return false
 	},
-	meta: TriggerMeta{
+	meta: &data.TriggerMeta{
 		Disabled: false,
 		Priority: 0,
 		Name:     "triggerToggle",
@@ -84,7 +88,7 @@ var triggerStatus = &SyncTrigger{
 		}
 		return false
 	},
-	meta: TriggerMeta{
+	meta: &data.TriggerMeta{
 		Disabled: false,
 		Priority: 0,
 		Name:     "triggerToggle",

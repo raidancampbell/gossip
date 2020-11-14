@@ -1,6 +1,7 @@
 package gossip
 
 import (
+	"github.com/raidancampbell/gossip/data"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/sorcix/irc.v2"
 	"strings"
@@ -19,7 +20,7 @@ var rename = &SyncTrigger{
 		}
 		return false
 	},
-	meta: TriggerMeta{
+	meta: &data.TriggerMeta{
 		Disabled: false,
 		Priority: 0,
 		Name:     "rename",

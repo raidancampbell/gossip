@@ -15,7 +15,7 @@ var reminderPattern = regexp.MustCompile(`(?i)^!remind (?P<Target>(me|[a-zA-Z]+)
 
 type rmd struct {
 	g *Bot
-	meta TriggerMeta
+	meta *data.TriggerMeta
 }
 
 func NewReminder(g *Bot) Trigger {
@@ -23,7 +23,7 @@ func NewReminder(g *Bot) Trigger {
 	g.db.Model(&data.Reminder{}).Find(&reminders)
 	rmd := rmd{
 		g:g,
-		meta: TriggerMeta{
+		meta: &data.TriggerMeta{
 			Disabled: false,
 			Priority: 0,
 			Name:     "reminder",
@@ -45,8 +45,12 @@ func (rmd rmd) waitRemind(r data.Reminder) {
 	rmd.g.db.Delete(&r)
 }
 
-func (rmd rmd) GetMeta() *TriggerMeta {
-	return &rmd.meta
+func (rmd rmd) GetMeta() *data.TriggerMeta {
+	return rmd.meta
+}
+
+func (rmd rmd) Meta(m *data.TriggerMeta) {
+	rmd.meta = m
 }
 
 func (rmd rmd) Condition(g *Bot, msg *irc.Message) (shouldApply bool) {

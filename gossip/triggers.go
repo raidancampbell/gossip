@@ -1,6 +1,9 @@
 package gossip
 
-import "gopkg.in/sorcix/irc.v2"
+import (
+	"github.com/raidancampbell/gossip/data"
+	"gopkg.in/sorcix/irc.v2"
+)
 
 // pattern stolen from https://github.com/whyrusleeping/hellabot/blob/master/hellabot.go
 type SyncTrigger struct {
@@ -11,15 +14,9 @@ type SyncTrigger struct {
 	// return true if processing should continue
 	Act func(*Bot, *irc.Message) (shouldContinue bool)
 
-	meta TriggerMeta
+	meta *data.TriggerMeta
 }
 
-// metadata for triggers, extracted for ease of iteration
-type TriggerMeta struct {
-	Disabled bool
-	Priority int // maybe a comparator? maybe don't need it at all?
-	Name string
-}
 
 func (t *SyncTrigger) Condition(b *Bot, msg *irc.Message) (shouldApply bool) {
 	return t.Cond(b, msg)
@@ -27,14 +24,18 @@ func (t *SyncTrigger) Condition(b *Bot, msg *irc.Message) (shouldApply bool) {
 func (t *SyncTrigger) Action(b *Bot, msg *irc.Message) (shouldContinue bool) {
 	return t.Act(b, msg)
 }
-func (t *SyncTrigger) GetMeta() *TriggerMeta {
-	return &t.meta
+func (t *SyncTrigger) GetMeta() *data.TriggerMeta {
+	return t.meta
+}
+func (t *SyncTrigger) Meta(m *data.TriggerMeta) {
+	t.meta = m
 }
 
 type Trigger interface {
 	Condition(*Bot, *irc.Message) (shouldApply bool)
 	Action(*Bot, *irc.Message) (shouldContinue bool)
-	GetMeta() *TriggerMeta
+	GetMeta() *data.TriggerMeta
+	Meta(*data.TriggerMeta)
 }
 
 var pingPong = &SyncTrigger{
@@ -48,7 +49,7 @@ var pingPong = &SyncTrigger{
 		}
 		return false
 	},
-	meta: TriggerMeta{
+	meta: &data.TriggerMeta{
 		Disabled: false,
 		Priority: 0,
 		Name:     "pingPong",
@@ -71,7 +72,7 @@ var joinChans = &SyncTrigger{
 		})
 		return true
 	},
-	meta: TriggerMeta{
+	meta: &data.TriggerMeta{
 		Disabled: false,
 		Priority: 0,
 		Name:     "joinChans",
@@ -91,7 +92,7 @@ var invite = &SyncTrigger{
 		}
 		return false
 	},
-	meta: TriggerMeta{
+	meta: &data.TriggerMeta{
 		Disabled: false,
 		Priority: 0,
 		Name:     "invite",
@@ -110,7 +111,7 @@ var userPingPong = &SyncTrigger{
 		}
 		return false
 	},
-	meta: TriggerMeta{
+	meta: &data.TriggerMeta{
 		Disabled: false,
 		Priority: 0,
 		Name:     "userPingPong",

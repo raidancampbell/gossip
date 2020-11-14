@@ -2,6 +2,7 @@ package gossip
 
 import (
 	"bytes"
+	"github.com/raidancampbell/gossip/data"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/net/html"
 	"gopkg.in/sorcix/irc.v2"
@@ -87,7 +88,7 @@ var htmlTitle = &SyncTrigger{
 		}
 		return
 	},
-	meta: TriggerMeta{
+	meta: &data.TriggerMeta{
 		Disabled: false,
 		Priority: 0,
 		Name:     "HTMLTitle",
