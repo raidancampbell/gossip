@@ -25,11 +25,13 @@ func initialize() {
 	viper.Unmarshal(cfg)
 
 	// http://splunk.autok8s.raidancampbell.com/en-US/app/search/search
-	logrus.AddHook(&logging.SplunkHook{
-		Token:        cfg.Logging.Splunk.Token,
-		Endpoint:     fmt.Sprintf("http://%s:%d/services/collector",cfg.Logging.Splunk.Host, cfg.Logging.Splunk.HECPort),
-		Client: http.DefaultClient,
-	})
+	if cfg.Logging.Splunk.Enabled {
+		logrus.AddHook(&logging.SplunkHook{
+			Token:        cfg.Logging.Splunk.Token,
+			Endpoint:     fmt.Sprintf("http://%s:%d/services/collector",cfg.Logging.Splunk.Host, cfg.Logging.Splunk.HECPort),
+			Client: http.DefaultClient,
+		})
+	}
 
 	lvl, err := logrus.ParseLevel(cfg.Logging.Level)
 	if err != nil {
