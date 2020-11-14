@@ -17,7 +17,7 @@ const (
 )
 
 // prints the html title text of any URLs within a message
-var htmlTitle = SyncTrigger{
+var htmlTitle = &SyncTrigger{
 	Cond: func(g *Bot, msg *irc.Message) bool {
 		if msg.Command != irc.PRIVMSG {
 			return false

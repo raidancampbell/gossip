@@ -9,7 +9,7 @@ import (
 
 // exit on !die
 //TODO: add authorization
-var quit = SyncTrigger{
+var quit = &SyncTrigger{
 	Cond: func(g *Bot, msg *irc.Message) bool {
 		return msg.Command == irc.PRIVMSG && len(msg.Params) == 2 && msg.Params[1] == "!die"
 	},

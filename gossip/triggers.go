@@ -21,23 +21,23 @@ type TriggerMeta struct {
 	Name string
 }
 
-func (t SyncTrigger) Condition(b *Bot, msg *irc.Message) (shouldApply bool) {
+func (t *SyncTrigger) Condition(b *Bot, msg *irc.Message) (shouldApply bool) {
 	return t.Cond(b, msg)
 }
-func (t SyncTrigger) Action(b *Bot, msg *irc.Message) (shouldContinue bool) {
+func (t *SyncTrigger) Action(b *Bot, msg *irc.Message) (shouldContinue bool) {
 	return t.Act(b, msg)
 }
-func (t SyncTrigger) GetMeta() TriggerMeta {
-	return t.meta
+func (t *SyncTrigger) GetMeta() *TriggerMeta {
+	return &t.meta
 }
 
 type Trigger interface {
 	Condition(*Bot, *irc.Message) (shouldApply bool)
 	Action(*Bot, *irc.Message) (shouldContinue bool)
-	GetMeta() TriggerMeta
+	GetMeta() *TriggerMeta
 }
 
-var pingPong = SyncTrigger{
+var pingPong = &SyncTrigger{
 	Cond: func(g *Bot, msg *irc.Message) bool {
 		return msg.Command == irc.PING
 	},
@@ -56,7 +56,7 @@ var pingPong = SyncTrigger{
 }
 
 // join desired channels on startup
-var joinChans = SyncTrigger{
+var joinChans = &SyncTrigger{
 	Cond: func(g *Bot, msg *irc.Message) bool {
 		return msg.Command == irc.RPL_WELCOME
 	},
@@ -80,7 +80,7 @@ var joinChans = SyncTrigger{
 }
 
 // on /invite, join the desired channel
-var invite = SyncTrigger{
+var invite = &SyncTrigger{
 	Cond: func(g *Bot, msg *irc.Message) bool {
 		return msg.Command == irc.INVITE
 	},
@@ -99,7 +99,7 @@ var invite = SyncTrigger{
 }
 
 // on !ping, give pong!
-var userPingPong = SyncTrigger{
+var userPingPong = &SyncTrigger{
 	Cond: func(g *Bot, msg *irc.Message) bool {
 		return msg.Command == irc.PRIVMSG && len(msg.Params) == 2 && msg.Params[1] == "!ping"
 	},

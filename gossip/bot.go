@@ -30,7 +30,7 @@ func New(n conf.Network, nick string) *Bot {
 		channels: n.Channels,
 		msgChan: make(chan *irc.Message),
 		joinChannels: &sync.Once{},
-		triggers: []Trigger{pingPong, joinChans, invite, userPingPong, htmlTitle, quit, part, rename, karmaCounter, KarmaBest, KarmaWorst},
+		triggers: []Trigger{pingPong, joinChans, invite, userPingPong, htmlTitle, quit, part, rename, karmaCounter, KarmaBest, KarmaWorst, triggerToggle, triggerStatus},
 	}
 	/* Feature todo:
 	[X] control its nick
@@ -41,7 +41,8 @@ func New(n conf.Network, nick string) *Bot {
 	[ ] wolfram
 	[ ] youtube
 	[X] part
-	[ ] feature toggles (needs interface/impl for features)
+	[X] feature toggles (needs interface/impl for features)
+	[ ] persistent feature toggles
 	*/
 	var err error
 	b.db, err = gorm.Open(sqlite.Open("gossip.db"), &gorm.Config{

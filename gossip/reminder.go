@@ -45,8 +45,8 @@ func (rmd rmd) waitRemind(r data.Reminder) {
 	rmd.g.db.Delete(&r)
 }
 
-func (rmd rmd) GetMeta() TriggerMeta {
-	return rmd.meta
+func (rmd rmd) GetMeta() *TriggerMeta {
+	return &rmd.meta
 }
 
 func (rmd rmd) Condition(g *Bot, msg *irc.Message) (shouldApply bool) {
