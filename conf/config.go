@@ -1,9 +1,10 @@
 package conf
 
 type Cfg struct {
-	Network Network `mapstructure:"network"`
-	Nick    string  `mapstructure:"nick"`
-	Logging Logging `mapstructure:"logging"`
+	Network   Network `mapstructure:"network"`
+	Nick      string  `mapstructure:"nick"`
+	OwnerNick string  `mapstructure:"ownerNick"`
+	Logging   Logging `mapstructure:"logging"`
 }
 
 type Network struct {

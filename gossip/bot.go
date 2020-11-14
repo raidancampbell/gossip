@@ -21,20 +21,23 @@ type Bot struct {
 	joinChannels *sync.Once // todo: move this into its own struct
 	triggers []Trigger
 	db *gorm.DB
+	cfg *conf.Cfg
 }
 
-func New(n conf.Network, nick string) *Bot {
+func New(cfg *conf.Cfg) *Bot {
+
 	b := &Bot{
-		addr: fmt.Sprintf("%s:%d", n.Host, n.Port),
-		nick: nick,
-		channels: n.Channels,
+		addr: fmt.Sprintf("%s:%d", cfg.Network.Host, cfg.Network.Port),
+		nick: cfg.Nick,
+		channels: cfg.Network.Channels,
 		msgChan: make(chan *irc.Message),
 		joinChannels: &sync.Once{},
-		triggers: []Trigger{pingPong, joinChans, invite, userPingPong, htmlTitle, quit, part, rename, karmaCounter, KarmaBest, KarmaWorst, triggerToggle, triggerStatus},
+		triggers: []Trigger{pingPong, joinChans, invite, userPingPong, htmlTitle, die, part, rename, karmaCounter, KarmaBest, KarmaWorst, triggerToggle, triggerStatus},
+		cfg: cfg,
 	}
 	/* Feature todo:
 	[X] control its nick
-	[ ] owner authorization
+	[X] owner authorization
 	[X] reminders (needs state)
 	[X] karma (needs state)
 	[X] source
@@ -126,6 +129,7 @@ func (g *Bot) decodeLoop() {
 func (g *Bot) handleTriggers(msg *irc.Message) {
 	for _, trigger := range g.triggers {
 		if !trigger.GetMeta().Disabled && trigger.Condition(g, msg) {
+			logrus.Tracef("matched on trigger '%s'", trigger.GetMeta().Name)
 			shouldContinue := trigger.Action(g, msg)
 			if !shouldContinue {
 				break

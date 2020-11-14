@@ -7,10 +7,9 @@ import (
 )
 
 // toggle triggers on !toggle, !enable, !disable
-//TODO: add authorization
 var triggerToggle = &SyncTrigger{
 	Cond: func(g *Bot, msg *irc.Message) bool {
-		return msg.Command == irc.PRIVMSG && len(msg.Params) == 2 && (strings.HasPrefix(msg.Params[1], "!toggle") || strings.HasPrefix(msg.Params[1], "!enable") || strings.HasPrefix(msg.Params[1], "!disable"))
+		return msg.Command == irc.PRIVMSG && len(msg.Params) == 2 && (strings.HasPrefix(msg.Params[1], "!toggle") || strings.HasPrefix(msg.Params[1], "!enable") || strings.HasPrefix(msg.Params[1], "!disable"))  && msg.Name == g.cfg.OwnerNick
 	},
 	Act: func(g *Bot, msg *irc.Message) bool {
 		words := strings.Split(msg.Params[1], " ")

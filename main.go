@@ -45,7 +45,7 @@ func main() {
 	logrus.Info("initialized")
 	logrus.Info(cfg.Nick)
 	fmt.Println(cfg.Network.Host)
-	g := gossip.New(cfg.Network, cfg.Nick)
+	g := gossip.New(cfg)
 
 	// blocking
 	g.Begin()

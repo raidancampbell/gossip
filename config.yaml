@@ -5,6 +5,7 @@ network:
   channels:
     - "#gossip-bot-test"
 nick: gossip
+ownerNick: gossip_owner
 logging:
   level: debug
   splunk:

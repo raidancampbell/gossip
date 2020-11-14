@@ -8,10 +8,9 @@ import (
 )
 
 // exit on !die
-//TODO: add authorization
-var quit = &SyncTrigger{
+var die = &SyncTrigger{
 	Cond: func(g *Bot, msg *irc.Message) bool {
-		return msg.Command == irc.PRIVMSG && len(msg.Params) == 2 && msg.Params[1] == "!die"
+		return msg.Command == irc.PRIVMSG && len(msg.Params) == 2 && msg.Params[1] == "!die" && msg.Name == g.cfg.OwnerNick
 	},
 	Act: func(g *Bot, msg *irc.Message) bool {
 		logrus.Info("Exiting...")
