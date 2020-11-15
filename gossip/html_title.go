@@ -47,20 +47,20 @@ var htmlTitle = &SyncTrigger{
 
 		r, err := http.NewRequest(http.MethodGet, u.String(), nil)
 		if err != nil {
-			logrus.WithError(err).Error("failed to create HTTP request to endpoint %+v", u)
+			logrus.WithError(err).Errorf("failed to create HTTP request to endpoint %+v", u)
 			return
 		}
 
 		resp, err := http.DefaultClient.Do(r)
 		if err != nil {
-			logrus.WithError(err).Error("failed to complete HTTP request to endpoint %+v", u)
+			logrus.WithError(err).Errorf("failed to complete HTTP request to endpoint %+v", u)
 			return
 		}
 		defer resp.Body.Close()
 
 		body, err := ioutil.ReadAll(io.LimitReader(resp.Body, maxHTMLResponseBytes))
 		if err != nil {
-			logrus.WithError(err).Error("failed to read %d bytes from %+v", maxHTMLResponseBytes, u)
+			logrus.WithError(err).Errorf("failed to read %d bytes from %+v", maxHTMLResponseBytes, u)
 			return
 		}
 		logrus.Debugf("URL %s had an HTML body of length %d", u.String(), len(body))

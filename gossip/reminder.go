@@ -36,7 +36,7 @@ func NewReminder(g *Bot) Trigger {
 }
 
 func (rmd rmd) waitRemind(r data.Reminder) {
-	logrus.Debug("forked off reminder thread for %+v", r)
+	logrus.Debugf("forked off reminder thread for %+v", r)
 	<- time.After(time.Until(r.At))
 	rmd.g.msgChan <- &irc.Message{
 		Command: irc.PRIVMSG,
