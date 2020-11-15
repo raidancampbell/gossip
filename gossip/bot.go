@@ -9,16 +9,13 @@ import (
 	"gopkg.in/sorcix/irc.v2"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"sync"
 )
 
 type Bot struct {
 	addr         string
 	nick         string
-	channels     []string
 	msgChan      chan *irc.Message
 	c            *irc.Conn
-	joinChannels *sync.Once // todo: move this into its own struct
 	triggers     []Trigger
 	db           *gorm.DB
 	cfg          *conf.Cfg
@@ -29,10 +26,8 @@ func New(cfg *conf.Cfg) *Bot {
 	b := &Bot{
 		addr:         fmt.Sprintf("%s:%d", cfg.Network.Host, cfg.Network.Port),
 		nick:         cfg.Nick,
-		channels:     cfg.Network.Channels,
 		msgChan:      make(chan *irc.Message),
-		joinChannels: &sync.Once{},
-		triggers:     []Trigger{pingPong, joinChans, invite, userPingPong, htmlTitle, die, part, rename, karma, toggle},
+		triggers:     []Trigger{pingPong, NewJoin(cfg.Network.Channels), invite, userPingPong, htmlTitle, die, part, rename, karma, toggle},
 		cfg:          cfg,
 	}
 	/* Feature todo:
