@@ -80,7 +80,7 @@ var htmlTitle = &SyncTrigger{
 				if nextType == html.TextToken {
 					g.msgChan <- &irc.Message{
 						Command: irc.PRIVMSG,
-						Params:  []string{mirrorMsg(g, msg), tok.Token().Data},
+						Params:  []string{mirrorMsg(g, msg), strings.Trim(tok.Token().Data, "\r\n\t ")},
 					}
 					break
 				}
