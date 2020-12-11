@@ -4,7 +4,7 @@ network:
   ssl: false
   channels:
     - "#gossip-bot-test"
-nick: gossip
+nick: gossip_test
 ownerNick: gossip_owner
 logging:
   level: debug
@@ -13,3 +13,9 @@ logging:
     host: splunk.autok8s.raidancampbell.com
     hecPort: 8088
     token: ef1dafce-8d3e-40b1-9a64-82cbc5e4274b
+triggers:
+  push:
+      APIKey: "TODO: FILL ME IN"
+      recipientKey: "TODO: FILL ME IN"
+      highlightOn:
+          - "aidan"

@@ -4,6 +4,7 @@ go 1.15
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
+	github.com/gregdel/pushover v0.0.0-20201104094836-ddbe0c1d3a38
 	github.com/raidancampbell/libraidan v0.5.1
 	github.com/sirupsen/logrus v1.2.0
 	github.com/spf13/viper v1.7.1
