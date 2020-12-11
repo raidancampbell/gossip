@@ -105,7 +105,9 @@ func (g *Bot) encodeLoop() {
 			logrus.Infof("connection closed, exiting %s", rruntime.GetMyFuncName())
 			return
 		}
-		logrus.WithFields(logrus.Fields{"message": fmt.Sprintf("%+v", msg), "raw_message": msg}).Debug("outgoing message")
+		if msg.Command != irc.PONG {
+			logrus.WithFields(logrus.Fields{"message": fmt.Sprintf("%+v", msg), "raw_message": msg}).Debug("outgoing message")
+		}
 		err := g.c.Encode(msg)
 		if err != nil {
 			logrus.WithError(err).Error("error during message encoding")
@@ -127,7 +129,9 @@ func (g *Bot) decodeLoop() {
 			logrus.Infof("no message to decode. exiting...")
 			return
 		}
-		logrus.WithFields(logrus.Fields{"message": fmt.Sprintf("%+v", msg), "raw_message": msg}).Debug("incoming message")
+		if msg.Command != irc.PING {
+			logrus.WithFields(logrus.Fields{"message": fmt.Sprintf("%+v", msg), "raw_message": msg}).Debug("incoming message")
+		}
 		// each incoming message gets its own goroutine
 		// just in case I really screw up and something hangs/dies,
 		// so that pingpong still lives on
