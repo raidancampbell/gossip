@@ -22,7 +22,7 @@ func NewPush(cfg *conf.Cfg) Trigger {
 	app := pushover.New(cfg.Triggers.Push.APIKey)
 	recip := pushover.NewRecipient(cfg.Triggers.Push.RecipientKey)
 	cfg.Triggers.Push.HighlightOn = append(cfg.Triggers.Push.HighlightOn, cfg.OwnerNick)
-	return &pushTrigger{
+	t :=  &pushTrigger{
 		a:           app,
 		r:           recip,
 		highlightOn: cfg.Triggers.Push.HighlightOn,
@@ -32,6 +32,11 @@ func NewPush(cfg *conf.Cfg) Trigger {
 			Name:     "push",
 		},
 	}
+	if cfg.Triggers.Push.APIKey == "TODO: FILL ME IN" || cfg.Triggers.Push.RecipientKey == "TODO: FILL ME IN" {
+		logrus.Warn("default invalid pushover credentials used. disabling pushover trigger...")
+		t.meta.Disabled = true
+	}
+	return t
 }
 
 func (p pushTrigger) Condition(_ *Bot, msg *irc.Message) (shouldApply bool) {
