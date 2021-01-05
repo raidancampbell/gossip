@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: gossip-bot
+  name: gossip-bot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gossip-bot
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: gossip-bot
+    spec:
+      containers:
+        - image: gossip-bot
+          imagePullPolicy: "Always"
+          name: gossip-bot-container
+          resources:
+            requests:
+              cpu: 100m
+              memory: 100Mi
+      restartPolicy: Always
+#TODO: persistent volume mount for sqlite. likely the correct choice will be to use a full sql instance or something.
