@@ -8,6 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"net/http"
+	"time"
 )
 
 var (
@@ -26,11 +27,13 @@ func initialize() {
 
 	// http://splunk.autok8s.raidancampbell.com/en-US/app/search/search
 	if cfg.Logging.Splunk.Enabled {
-		logrus.AddHook(&logging.SplunkHook{
-			Token:        cfg.Logging.Splunk.Token,
-			Endpoint:     fmt.Sprintf("http://%s:%d/services/collector",cfg.Logging.Splunk.Host, cfg.Logging.Splunk.HECPort),
-			Client: http.DefaultClient,
-		})
+		logrus.AddHook(
+			logging.NewSplunkHook(
+				http.DefaultClient,
+				fmt.Sprintf("http://%s:%d/services/collector", cfg.Logging.Splunk.Host, cfg.Logging.Splunk.HECPort),
+				cfg.Logging.Splunk.Token,
+				1*time.Second,
+				100))
 	}
 
 	lvl, err := logrus.ParseLevel(cfg.Logging.Level)
