@@ -30,7 +30,7 @@ type SplunkHook struct {
 	FlushFreq    time.Duration
 	MaxFlushSize int
 
-	msg chan *SplunkLog
+	msg chan *logrus.Entry
 }
 
 func NewSplunkHook(client *http.Client, endpoint string, token string, flushFreq time.Duration, maxFlushSize int) logrus.Hook {
@@ -46,7 +46,7 @@ func NewSplunkHook(client *http.Client, endpoint string, token string, flushFreq
 	if hook.FlushFreq == 0 {
 		hook.FlushFreq = 1 * time.Second
 	}
-	hook.msg = make(chan *SplunkLog, hook.MaxFlushSize)
+	hook.msg = make(chan *logrus.Entry, hook.MaxFlushSize)
 	go hook.manageBuffer()
 	return hook
 }
@@ -54,10 +54,10 @@ func NewSplunkHook(client *http.Client, endpoint string, token string, flushFreq
 func (s *SplunkHook) manageBuffer() {
 	ticker := time.NewTicker(s.FlushFreq)
 
-	buf := make([]*SplunkLog, 0)
+	buf := make([]*logrus.Entry, 0)
 	flush := func() {
 		go s.doSend(buf)
-		buf = make([]*SplunkLog, 0)
+		buf = make([]*logrus.Entry, 0)
 	}
 	for {
 		select {
@@ -76,17 +76,30 @@ func (s *SplunkHook) manageBuffer() {
 
 // doSend is synchronous with the actual HTTP send
 // errors are all ignored.
-func (s *SplunkHook) doSend(logs []*SplunkLog) {
+func (s *SplunkHook) doSend(logs []*logrus.Entry) {
+	// buffer and its underlying contents
 	_b := []byte{}
 	outputBuf := bytes.NewBuffer(_b)
+
+	// a json encoder to serialize the splunk log into the buffer
 	encoder := json.NewEncoder(outputBuf)
+
+	// for each log built up request:
+	//encode the log content into bytes, wrap it in its metadata, and JSON encode into the buffer
 	for i := range logs {
-		_ = encoder.Encode(logs[i])
+		b, _ := formatter.Format(logs[i])
+		_ = encoder.Encode(&SplunkLog{
+			Time:  logs[i].Time.UnixNano(),
+			Host:  host,
+			Event: b,
+		})
 	}
 
+	// build the HTTP request to send it to splunk
 	req, _ := http.NewRequest(http.MethodPost, s.Endpoint, outputBuf)
-
 	req.Header.Set("Authorization", fmt.Sprintf("Splunk %s", s.Token))
+
+	// and execute it
 	res, err := s.Client.Do(req)
 	if err != nil {
 		fmt.Println(err)
@@ -104,15 +117,8 @@ func (s *SplunkHook) Levels() []logrus.Level {
 }
 
 func (s *SplunkHook) Fire(e *logrus.Entry) error {
-	b, err := formatter.Format(e)
-
-	s.msg <- &SplunkLog{
-		Time:  e.Time.UnixNano(),
-		Host:  host,
-		Event: b,
-	}
-
-	return err
+	s.msg <- e
+	return nil
 }
 
 type SplunkLog struct {
