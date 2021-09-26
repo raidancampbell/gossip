@@ -32,22 +32,22 @@ var triggerToggle = &SyncTrigger{
 		for i := range g.triggers {
 			t = append(t, g.triggers[i].GetMeta().Name)
 			if strings.EqualFold(g.triggers[i].GetMeta().Name, words[1]) {
-				var nextState bool
+				var nextDisabled bool
 				if strings.EqualFold(words[0], "!toggle") {
-					nextState = !g.triggers[i].GetMeta().Disabled
+					nextDisabled = !g.triggers[i].GetMeta().Disabled
 				} else if strings.EqualFold(words[0], "!enable") {
-					nextState = true
+					nextDisabled = false
 				} else if strings.EqualFold(words[0], "!disable") {
-					nextState = false
+					nextDisabled = true
 				}
 
 				g.msgChan <- &irc.Message{
 					Command: irc.PRIVMSG,
-					Params:  []string{mirrorMsg(g, msg), fmt.Sprintf("%s: was %s, now %s", g.triggers[i].GetMeta().Name, disabledToStr(g.triggers[i].GetMeta().Disabled), disabledToStr(nextState))},
+					Params:  []string{mirrorMsg(g, msg), fmt.Sprintf("%s: was %s, now %s", g.triggers[i].GetMeta().Name, disabledToStr(g.triggers[i].GetMeta().Disabled), disabledToStr(nextDisabled))},
 				}
-				g.triggers[i].GetMeta().Disabled = nextState
+				g.triggers[i].GetMeta().Disabled = nextDisabled
 
-				g.db.Model(&data.TriggerMeta{}).Where(&data.TriggerMeta{Name: g.triggers[i].GetMeta().Name}).Save(g.triggers[i].GetMeta())
+				g.db.Model(&data.TriggerMeta{}).Where(&data.TriggerMeta{Name: g.triggers[i].GetMeta().Name}).Update("disabled", g.triggers[i].GetMeta().Disabled)
 				return false
 			}
 		}
