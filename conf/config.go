@@ -9,10 +9,11 @@ type Cfg struct {
 }
 
 type Network struct {
-	Host     string   `mapstructure:"host"`
-	Port     int      `mapstructure:"port"`
-	SSL      bool     `mapstructure:"ssl"`
-	Channels []string `mapstructure:"channels"`
+	Host      string   `mapstructure:"host"`
+	Port      int      `mapstructure:"port"`
+	SSL       bool     `mapstructure:"ssl"`
+	Channels  []string `mapstructure:"channels"`
+	OnConnect []string `mapstructure:"onConnect"`
 }
 
 type Logging struct {

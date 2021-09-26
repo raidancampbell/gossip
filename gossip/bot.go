@@ -27,7 +27,7 @@ func New(cfg *conf.Cfg) *Bot {
 		addr:         fmt.Sprintf("%s:%d", cfg.Network.Host, cfg.Network.Port),
 		nick:         cfg.Nick,
 		msgChan:      make(chan *irc.Message),
-		triggers:     []Trigger{pingPong, NewJoin(cfg.Network.Channels), invite, NewPush(cfg), userPingPong, htmlTitle, die, part, rename, karma, toggle, source},
+		triggers:     []Trigger{pingPong, onConnect, NewJoin(cfg.Network.Channels), invite, NewPush(cfg), userPingPong, htmlTitle, die, part, rename, karma, toggle, source},
 		cfg:          cfg,
 	}
 	/* Feature todo:

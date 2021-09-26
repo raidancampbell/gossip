@@ -2,8 +2,10 @@ package gossip
 
 import (
 	"github.com/raidancampbell/gossip/data"
+	"github.com/sirupsen/logrus"
 	"gopkg.in/sorcix/irc.v2"
 	"sync"
+	"time"
 )
 
 // join desired channels on startup
@@ -31,12 +33,19 @@ func (j joinChannels) Condition(_ *Bot, msg *irc.Message) (shouldApply bool) {
 
 func (j joinChannels) Action(g *Bot, _ *irc.Message) (shouldContinue bool) {
 	j.o.Do(func() {
-		for _, chn := range j.channels {
-			g.msgChan <- &irc.Message{
-				Command: irc.JOIN,
-				Params:  []string{chn},
+		go func() {
+			if len(g.cfg.Network.OnConnect) > 0 {
+				waitTime := 10 * time.Second
+				logrus.Infof("waiting %s before joining channels to allow onConnect command to run...", waitTime.String())
+				time.Sleep(waitTime)
 			}
-		}
+			for _, chn := range j.channels {
+				g.msgChan <- &irc.Message{
+					Command: irc.JOIN,
+					Params:  []string{chn},
+				}
+			}
+		}()
 	})
 	return true
 }
