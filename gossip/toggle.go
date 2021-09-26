@@ -37,7 +37,7 @@ var triggerToggle = &SyncTrigger{
 					nextState = !g.triggers[i].GetMeta().Disabled
 				} else if strings.EqualFold(words[0], "!enable") {
 					nextState = true
-				} else if strings.EqualFold(words[0], "!false") {
+				} else if strings.EqualFold(words[0], "!disable") {
 					nextState = false
 				}
 
