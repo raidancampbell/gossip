@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
 	"github.com/raidancampbell/gossip/conf"
 	"github.com/raidancampbell/gossip/gossip"
@@ -26,10 +27,17 @@ func initialize() {
 	viper.Unmarshal(cfg)
 
 	// http://splunk.autok8s.raidancampbell.com/en-US/app/search/search
+	client := http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		},
+	}
 	if cfg.Logging.Splunk.Enabled {
 		logrus.AddHook(
 			logging.NewSplunkHook(
-				http.DefaultClient,
+				&client,
 				fmt.Sprintf("http://%s:%d/services/collector", cfg.Logging.Splunk.Host, cfg.Logging.Splunk.HECPort),
 				cfg.Logging.Splunk.Token,
 				1*time.Second,
