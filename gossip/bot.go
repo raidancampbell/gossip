@@ -1,6 +1,7 @@
 package gossip
 
 import (
+	"errors"
 	"fmt"
 	"github.com/raidancampbell/gossip/conf"
 	"github.com/raidancampbell/gossip/data"
@@ -9,26 +10,27 @@ import (
 	"gopkg.in/sorcix/irc.v2"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"strings"
 )
 
 type Bot struct {
-	addr         string
-	nick         string
-	msgChan      chan *irc.Message
-	c            *irc.Conn
-	triggers     []Trigger
-	db           *gorm.DB
-	cfg          *conf.Cfg
+	addr     string
+	nick     string
+	msgChan  chan *irc.Message
+	c        *irc.Conn
+	triggers []Trigger
+	db       *gorm.DB
+	cfg      *conf.Cfg
 }
 
 func New(cfg *conf.Cfg) *Bot {
 
 	b := &Bot{
-		addr:         fmt.Sprintf("%s:%d", cfg.Network.Host, cfg.Network.Port),
-		nick:         cfg.Nick,
-		msgChan:      make(chan *irc.Message),
-		triggers:     []Trigger{pingPong, onConnect, NewJoin(cfg.Network.Channels), invite, NewPush(cfg), userPingPong, htmlTitle, die, part, rename, karma, toggle, source},
-		cfg:          cfg,
+		addr:     fmt.Sprintf("%s:%d", cfg.Network.Host, cfg.Network.Port),
+		nick:     cfg.Nick,
+		msgChan:  make(chan *irc.Message),
+		triggers: []Trigger{pingPong, onConnect, NewJoin(cfg.Network.Channels), invite, NewPush(cfg), userPingPong, htmlTitle, die, part, rename, karma, toggle, source},
+		cfg:      cfg,
 	}
 	/* Feature todo:
 	[X] control its nick
@@ -96,7 +98,18 @@ func (g *Bot) Begin() {
 		}
 	}()
 
-	g.decodeLoop()
+	for {
+		err = g.decodeLoop()
+		if !strings.Contains(err.Error(), "connection closed") || !strings.Contains(err.Error(), "connection timed out") {
+			return
+		}
+		c, err := irc.Dial(g.addr)
+		if err != nil {
+			logrus.WithError(err).Errorf("unable to dial IRC addr '%s'", g.addr)
+		}
+		logrus.Infof("successfully connected to network '%s'", g.addr)
+		g.c = c
+	}
 }
 
 func (g *Bot) encodeLoop() {
@@ -110,16 +123,16 @@ func (g *Bot) encodeLoop() {
 		}
 		err := g.c.Encode(msg)
 		if err != nil {
-			logrus.WithError(err).Error("error during message encoding")
+			logrus.WithError(err).Fatal("error during message encoding")
 		}
 	}
 }
 
-func (g *Bot) decodeLoop() {
+func (g *Bot) decodeLoop() error {
 	for {
 		if g.c == nil {
 			logrus.Infof("connection closed, exiting %s...", rruntime.GetMyFuncName())
-			return
+			return errors.New("connection closed")
 		}
 		msg, err := g.c.Decode()
 		if err != nil {
@@ -127,7 +140,7 @@ func (g *Bot) decodeLoop() {
 		}
 		if msg == nil {
 			logrus.Infof("no message to decode. exiting...")
-			return
+			return fmt.Errorf("%w: nil message, exiting loop", err)
 		}
 		if msg.Command != irc.PING {
 			logrus.WithFields(logrus.Fields{"message": fmt.Sprintf("%+v", msg), "raw_message": msg}).Debug("incoming message")
